@@ -1,0 +1,17 @@
+{
+  "texture": "assets/characters/char1.png",
+  "attachments": {
+    "head": [
+      {"name": "bob", "variant": 1}
+    ],
+    "face": [
+      {"name": "blush", "variant": 1},
+      {"name": "eye", "variant": 1}
+    ],
+    "body": [
+      {"name": "shirt", "variant": 1},
+      {"name": "pants", "variant": 1},
+      {"name": "dress", "variant": 1}
+    ]
+  }
+}

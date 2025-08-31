@@ -1,0 +1,26 @@
+[
+  {
+    "type": "shirt",
+    "name": "shirt",
+    "texture": "assets/clothes/basic.png",
+    "variants": 10
+  },
+  {
+    "type": "pants",
+    "name": "pants",
+    "texture": "assets/clothes/pants.png",
+    "variants": 10
+  },
+  {
+    "type": "shoes",
+    "name": "shoes",
+    "texture": "assets/clothes/shoes.png",
+    "variants": 10
+  },
+  {
+    "type": "dress",
+    "name": "dress",
+    "texture": "assets/clothes/dress.png",
+    "variants": 10
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "texture": ["assets/characters/char_all.png", 0],
+  "attachments": {
+    "head": [
+      ["assets/hair/gentleman.png", 0]
+    ],
+    "face": [
+      ["assets/acc/beard.png", 0]
+    ],
+    "body": [
+      ["assets/clothes/shoes.png", 0],
+      ["assets/clothes/pants.png", 0],
+      ["assets/clothes/basic.png", 0]
+    ]
+  }
+}

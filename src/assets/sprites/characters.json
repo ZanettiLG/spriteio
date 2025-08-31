@@ -1,0 +1,14 @@
+[
+  {
+    "type": "body",
+    "name": "male",
+    "texture": "assets/characters/char_all.png",
+    "variants": 8
+  },
+  {
+    "type": "body",
+    "name": "female",
+    "texture": "assets/characters/char_all.png",
+    "variants": 8
+  }
+]

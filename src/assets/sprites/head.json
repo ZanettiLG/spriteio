@@ -1,0 +1,20 @@
+[
+  {
+    "type": "hair",
+    "name": "bob",
+    "texture": "assets/hair/bob.png",
+    "variants": 14
+  },
+  {
+    "type": "hair",
+    "name": "gentleman",
+    "texture": "assets/hair/gentleman.png",
+    "variants": 14
+  },
+  {
+    "type": "beard",
+    "name": "beard",
+    "texture": "assets/acc/beard.png",
+    "variants": 14
+  }
+]

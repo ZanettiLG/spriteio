@@ -1,0 +1,20 @@
+[
+  {
+    "type": "makeup",
+    "name": "blush",
+    "texture": "assets/eyes/blush_all.png",
+    "variants": 5
+  },
+  {
+    "type": "makeup",
+    "name": "lipstick",
+    "texture": "assets/eyes/lipstick.png",
+    "variants": 5
+  },
+  {
+    "type": "eyes",
+    "name": "eye",
+    "texture": "assets/eyes/eyes.png",
+    "variants": 14
+  }
+]
