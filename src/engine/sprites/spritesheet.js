@@ -1,5 +1,6 @@
 import { Rect } from "../geometry";
-import { Sprite, Texture, TEXTURE_STATUS } from "../renderer";
+import { ASSET_STATUS } from "../asset";
+import { Sprite, Texture } from "../renderer";
 
 class SpriteSheet extends Sprite {
   /**
@@ -14,10 +15,11 @@ class SpriteSheet extends Sprite {
 
   draw(ctx, center = []) {
     if(!this.texture) return;
-    if(this.texture.status === TEXTURE_STATUS.ERROR) {
+    if(this.texture.status === ASSET_STATUS.ERROR) {
       return;
     }
-    if(this.texture.status === TEXTURE_STATUS.UNLOADED) {
+    
+    if(this.texture.status === ASSET_STATUS.UNLOADED) {
       this.texture.load();
       console.log("loading texture", this.texture);
       return;
@@ -39,7 +41,7 @@ class SpriteSheet extends Sprite {
       height,
     ];
     
-    ctx.drawImage(this.texture.image, ...spriteRect, ...rect);
+    ctx.drawImage(this.texture.resource, ...spriteRect, ...rect);
   }
 }
 

@@ -1,3 +1,4 @@
+export * from "./asset";
 export * from "./maths";
 export * from "./loader";
 export * from "./sprites";

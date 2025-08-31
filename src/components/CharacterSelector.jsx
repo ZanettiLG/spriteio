@@ -24,6 +24,7 @@ import {
   Renderer,
   Character,
   SpriteSheet,
+  AssetManager,
 } from '../engine';
 
 const TYPE_ICONS = Object.freeze({
@@ -39,7 +40,6 @@ const TYPE_ICONS = Object.freeze({
 });
 
 const DEFAULT_CHARACTER = Object.freeze(Object.fromEntries(LOCAL_LIST.map((type) => [type, null])));
-
 
 const ParameterSelectorButton = ({onClick, children, disabled}) => {
   return (
@@ -70,7 +70,7 @@ const ParameterSelector = ({type, min=-1, value=min, onChange}) => {
   const [currentValue, setCurrentValue] = useState(value);
   const spriteList = useMemo(() => spriteTypes[type], [type]);
 
-  const maxValue = useMemo(() => spriteList.length - 1, [spriteList, min]);
+  const maxValue = useMemo(() => spriteList.length - 1, [spriteList]);
   const minValue = useMemo(() => min, [min]);
 
   const isMin = useMemo(() => currentValue === minValue, [currentValue, minValue]);
@@ -96,7 +96,7 @@ const ParameterSelector = ({type, min=-1, value=min, onChange}) => {
       onChange(type, null);
       return;
     }
-    const texture = new Texture(sprite.texture);
+    const texture = AssetManager.load(sprite.texture, Texture);
     const spriteData = {
       type: sprite.type,
       name: sprite.name,
@@ -104,7 +104,7 @@ const ParameterSelector = ({type, min=-1, value=min, onChange}) => {
       texture,
     };
     onChange(type, spriteData);
-  }, [spriteList]);
+  }, [spriteList, type]);
 
   useEffect(() => {
     loadSprite(currentValue);
@@ -150,11 +150,9 @@ const CharacterPreviewer = ({character, width=100, height=200}) => {
 
   useEffect(() => {
     if(!rendererRef.current) return;
-    console.log("character", character);
     for (const type in character) {
       const selected_attachment = character[type];
       const updatingTexture = selected_attachment?.texture;
-      //updatingTexture?.load();
       if(!sprites[type]) {
         const newSprite = new SpriteSheet(updatingTexture, new Rect(0, 0, 128, 128));
         rendererRef.current.addSprite(newSprite);
@@ -164,7 +162,7 @@ const CharacterPreviewer = ({character, width=100, height=200}) => {
       const sprite = sprites[type];
       sprite.texture = updatingTexture;
     }
-  }, [rendererRef.current, character]);
+  }, [rendererRef.current, character, sprites]);
 
   useEffect(() => {
     handleStart();

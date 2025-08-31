@@ -2,44 +2,34 @@ import { Rect } from "./geometry";
 import { nextFrame as nextFrameCoroutine } from "./coroutine";
 
 export const SPRITE_TYPE = Object.freeze({
-  SPRITE: 0,
   MAP: 1,
+  SPRITE: 0,
   CHARACTER: 2,
 });
-
-export const TEXTURE_STATUS = Object.freeze({
-  ERROR: -1,
-  LOADED: 2,
-  LOADING: 1,
-  UNLOADED: 0,
-});
-
-export class Texture {
+import { ASSET_STATUS, Asset } from "./asset";
+export class Texture extends Asset {
   /**
-   * @param {string} path 
+   * @param {string} source 
    */
-  constructor(path) {
-    this.path = path;
-    this.image = null;
-    this.status = TEXTURE_STATUS.UNLOADED;
+  constructor(source) {
+    super(source);
+    this.resource = new Image();
   }
 
   async load() {
-    const image = new Image();
-    this.image = image;
-    this.status = TEXTURE_STATUS.LOADING;
+    this.status = ASSET_STATUS.LOADING;
     return await new Promise((resolve, reject) => {
-      image.onload = () => {
-        this.status = TEXTURE_STATUS.LOADED;
-        resolve(image);
+      this.resource.onload = () => {
+        this.status = ASSET_STATUS.LOADED;
+        resolve();
       };
-      image.onerror = (error) => {
-        this.status = TEXTURE_STATUS.ERROR;
+      this.resource.onerror = (error) => {
+        this.status = ASSET_STATUS.ERROR;
         console.error(error);
         reject(error);
       };
-      image.src = this.path;
-      image.decode();
+      this.resource.src = this.source;
+      this.resource.decode();
     });
   }
 
@@ -52,17 +42,16 @@ export class Sprite {
    * @param {Rect} rect 
    */
   constructor(texture, rect) {
-    console.log("sprite", texture, rect);
     this.rect = rect;
     this.texture = texture;
   }
 
   draw(ctx, center = []) {
     if(!this.texture) return;
-    if(this.texture.status === TEXTURE_STATUS.ERROR) {
+    if(this.texture.status === ASSET_STATUS.ERROR) {
       return;
     }
-    if(this.texture.status === TEXTURE_STATUS.UNLOADED) {
+    if(this.texture.status === ASSET_STATUS.UNLOADED) {
       this.texture.load();
       console.log("loading texture", this.texture);
       return;
@@ -78,7 +67,7 @@ export class Sprite {
       height,
     ];
     
-    ctx.drawImage(this.texture.image, ...rect);
+    ctx.drawImage(this.texture.resource, ...rect);
   }
 }
 
