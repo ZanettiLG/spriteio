@@ -6,7 +6,7 @@ export * from "./geometry";
 export * from "./renderer";
 export * from "./coroutine";
 export * as controllers from "./controllers";
-export { default as Character, LOCAL, LOCAL_LIST, DIRECTIONS } from "./character";
+export { default as Character, LOCAL, LOCAL_LIST, DIRECTIONS, loadAttachments, DEFAULT_ATTACHMENTS } from "./character";
 
 import { nextFrame as nextFrameCoroutine } from "./coroutine";
 import { Renderer } from "./renderer";
@@ -56,6 +56,7 @@ function Engine({canvas, width, height}) {
 
   function update() {
     engine.renderer.update();
+    engine.characters.forEach((character) => character.update());
     engine.controllers.forEach((controller) => controller.update());
     engine.onUpdate?.(engine);
   }

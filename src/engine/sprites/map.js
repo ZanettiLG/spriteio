@@ -1,21 +1,24 @@
 import { Rect } from "../geometry";
-import { Sprite } from "../renderer";
-import { loadTexture } from "../loader";
+import { Sprite, Texture } from "../renderer";
+import { AssetManager } from "../asset";
 
 export default class TileMap extends Sprite {
+  
   constructor (texture, tilemap, cellSize = 32) {
-    super(texture);
+    super(texture, {zIndex: -100});
     this.tilemap = tilemap;
     this.cellSize = cellSize;
     // Criar um mapeamento de índices para retângulos de textura
     this.tileRects = new Map();
+
+    const resource = texture.resource;
     
     // Calcular quantos tiles cabem na textura horizontalmente
-    const tilesPerRow = Math.floor(texture.width / tilemap.cellSize);
+    const tilesPerRow = Math.floor(resource.width / tilemap.cellSize);
     
     // Criar retângulos para cada tile na textura
     for (let i = 0; i < tilesPerRow; i++) {
-      for (let j = 0; j < Math.floor(texture.height / tilemap.cellSize); j++) {
+      for (let j = 0; j < Math.floor(resource.height / tilemap.cellSize); j++) {
         const tileIndex = j * tilesPerRow + i;
         this.tileRects.set(tileIndex, new Rect(
           (i * tilemap.cellSize) + 1,
@@ -40,19 +43,24 @@ export default class TileMap extends Sprite {
       for (let x = 0; x < this.tilemap.width; x++) {
         const tileIndex = y * this.tilemap.width + x;
         const tileId = this.tilemap.tiles[tileIndex];
-        // Obter o retângulo da textura para este tile
+
         const sourceRect = this.tileRects.get(tileId);
+
         if (!sourceRect) {
           throw new Error(`Tile ID ${tileId} não encontrado na textura`);
         }
-        const destX = offsetX + (x * this.cellSize);
-        const destY = offsetY + (y * this.cellSize);
+
+        const targetRect = [
+          offsetX + (x * this.cellSize),
+          offsetY + (y * this.cellSize),
+          this.cellSize,
+          this.cellSize,
+        ]
         
-        // Desenhar o tile
         ctx.drawImage(
-          this.texture,
-          ...sourceRect,
-          destX, destY, this.cellSize, this.cellSize
+          this.texture.resource,
+          ...sourceRect.flat(),
+          ...targetRect,
         );
       }
     }
@@ -62,6 +70,8 @@ export default class TileMap extends Sprite {
 export async function loadMap(path) {
   const response = await fetch(path);
   const data = await response.json();
-  const texture = await loadTexture(data.texture);
+  console.log(data.texture);
+  const texture = AssetManager.load(data.texture, Texture);
+  await texture.load();
   return new TileMap(texture, data);
 }

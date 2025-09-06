@@ -9,7 +9,7 @@ class SpriteSheet extends Sprite {
    * @param {Rect} rect 
    */
   constructor(texture, rect, frame = new Rect(0, 0, 32, 32)) {
-    super(texture, rect);
+    super(texture, {rect});
     this.frame = frame;
   }
 
@@ -18,7 +18,7 @@ class SpriteSheet extends Sprite {
     if(this.texture.status === ASSET_STATUS.ERROR) {
       return;
     }
-    
+
     if(this.texture.status === ASSET_STATUS.UNLOADED) {
       this.texture.load();
       console.log("loading texture", this.texture);
@@ -30,7 +30,7 @@ class SpriteSheet extends Sprite {
     const [framePos, frameSize] = this.frame;
     
     const spriteRect = [
-      ...framePos,
+      ...[framePos[0] * frameSize[0] + 1, framePos[1] * frameSize[1] + 1],
       ...frameSize,
     ];
 

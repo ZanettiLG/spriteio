@@ -25,6 +25,8 @@ import {
   Character,
   SpriteSheet,
   AssetManager,
+  loadAttachments,
+  DEFAULT_ATTACHMENTS,
 } from '../engine';
 
 const TYPE_ICONS = Object.freeze({
@@ -38,8 +40,6 @@ const TYPE_ICONS = Object.freeze({
   [LOCAL.DRESS]: dress,
   [LOCAL.MAKEUP]: makeup,
 });
-
-const DEFAULT_CHARACTER = Object.freeze(Object.fromEntries(LOCAL_LIST.map((type) => [type, null])));
 
 const ParameterSelectorButton = ({onClick, children, disabled}) => {
   return (
@@ -181,10 +181,22 @@ const CharacterPreviewer = ({character, width=100, height=200}) => {
   );
 }
 
-const CharacterSelector = () => {
-  const [character, setCharacter] = useState(DEFAULT_CHARACTER);
+const CharacterSelector = ({setPage}) => {
+  const [character, setCharacter] = useState(DEFAULT_ATTACHMENTS);
 
-  const handleSpriteSelect = (type, value) => {
+  const loadCharacter = useCallback(async (character) => {
+    const loadedAttachments = await loadAttachments(character);
+    setCharacter(loadedAttachments);
+  }, []);
+
+  useEffect(() => {
+    const storedCharacter = window.localStorage.getItem('character');
+    if (storedCharacter) {
+      loadCharacter(JSON.parse(storedCharacter));
+    }
+  }, [loadCharacter]);
+
+  const handleSpriteSelect = useCallback((type, value) => {
     if (!value) {
       setCharacter((prev) => ({ ...prev, [type]: null}));
       return;
@@ -198,7 +210,13 @@ const CharacterSelector = () => {
     };
 
     setCharacter((prev) => ({ ...prev, [type]: spriteData}));
-  };
+  }, []);
+
+  const handleSave = useCallback(() => {
+    console.log(character);
+    window.localStorage.setItem('character', JSON.stringify(character));
+    //setPage('game');
+  }, [character, setPage]);
 
   return (
     <div className="character-selector">
@@ -219,6 +237,7 @@ const CharacterSelector = () => {
           <ParameterSelector type="makeup" onChange={handleSpriteSelect} />
         </div>
       </div>
+      <button onClick={handleSave}>Save</button>
     </div>
   );
 };

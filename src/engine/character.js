@@ -1,6 +1,9 @@
 import { magnitude } from "./maths";
 import { Rect } from "./geometry";
 import { SpriteSheet } from "./sprites";
+import { AssetManager } from "./asset";
+import { Texture } from "./renderer";
+import Sprites from "../assets/sprites";
 
 /**
  * @typedef {typeof LOCAL} ILOCAL
@@ -28,6 +31,31 @@ const DIRECTION_MAP = Object.freeze([
 
 export const DIRECTIONS = Object.freeze(Object.fromEntries(DIRECTION_MAP.map((direction, index) => [direction, index])));
 
+export const DEFAULT_ATTACHMENTS = Object.freeze(Object.fromEntries(LOCAL_LIST.map((type) => [type, null])));
+
+export const loadAttachments = async (attachments=DEFAULT_ATTACHMENTS) => {
+  const returnedAttachments = Object.fromEntries(await Promise.all(
+    Object.entries(attachments).map(
+      async ([type, value]) => {
+        if (!value) {
+          return [type, null];
+        }
+        const sprite = Sprites[value.name];
+        const texture = AssetManager.load(sprite.texture, Texture);
+        //console.log(texture);
+        return [
+          type,
+          {
+            ...value,
+            texture,
+          }
+        ];
+      }
+    )
+  ));
+  return returnedAttachments;
+};
+
 /**
  * @typedef {Object} Attachment
  * @property {ILOCAL} local
@@ -41,14 +69,17 @@ export class Character extends SpriteSheet {
    * @param {Image} image 
    * @param {Rect} rect 
    */
-  constructor({attachments: {body, ...attachments}, rect = new Rect(), speed = 1}) {
-    super(body, rect);
+  constructor({attachments: {body, ...attachments} = DEFAULT_ATTACHMENTS, rect = new Rect(), speed = 1}) {
+    super(body.texture, rect);
     this.speed = speed;
     this.velocity = [0, 0];
     this.animationFrame = 0;
+    this.attachments = Object.fromEntries(
+      Object.entries(attachments).map(
+        ([local, attachment]) => [local, attachment ? new SpriteSheet(attachment.texture, rect, this.frame) : null]
+      )
+    );
     this.direction = DIRECTIONS.DOWN;
-    this.attachments = LOCAL_LIST.map((attachment) => attachments[attachment] || attachments[attachment.toLowerCase()] || []);
-    console.log(this.attachments);
   }
 
   /**
@@ -57,7 +88,6 @@ export class Character extends SpriteSheet {
    */
   attach(attachment) {
     attachment.forEach((attachment) => {
-      console.log(attachment);
       if(!this.attachments[attachment.local.toLowerCase()]) {
         this.attachments[attachment.local.toLowerCase()] = [];
       }
@@ -66,9 +96,20 @@ export class Character extends SpriteSheet {
     this.attachments = this.attachments.concat(attachment);
   }
 
+  draw(ctx, [centerX, centerY] = []) {
+    const drawingPosition = [centerX, centerY - (this.rect.height/2)];
+    super.draw(ctx, drawingPosition);
+    if (!this.attachments) return;
+    for (const attachment of Object.values(this.attachments)) {
+      if(!attachment) continue;
+      attachment.draw(ctx, drawingPosition);
+    }
+  }
+
   update() {
     const velocity = magnitude(...this.velocity);
-    this.frame = velocity > 0 ? Math.floor(((this.animationFrame + velocity) / 10)) % 8 : 0;
+    this.frame[0][0] = velocity > 0 ? Math.floor(((this.animationFrame + velocity) / 10)) % 8 : 0;
+    this.frame[0][1] = this.direction;
     this.animationFrame = this.animationFrame + 1;
   }
 
@@ -91,8 +132,8 @@ export class Character extends SpriteSheet {
       }
     }
 
-    this.rect[0] += this.velocity[0];
-    this.rect[1] += this.velocity[1];
+    this.rect.x += this.velocity[0];
+    this.rect.y += this.velocity[1];
   }
 
   get position() {

@@ -5,7 +5,8 @@ import Engine,{
   normalize,
   Character,
   controllers,
-  loadCharacter,
+  loadAttachments,
+  DEFAULT_ATTACHMENTS,
 } from '../engine';
 import CharacterSelector from '../components/CharacterSelector';
 
@@ -28,10 +29,14 @@ const GameLogic = ({children}) => {
 
     engine.addMap('maps/test.json');
 
-    const character = await loadCharacter(
-      'characters/char2.json',
-      new Rect(0, 0, 64, 64),
-    );
+    const storedCharacter = window.localStorage.getItem('character') && JSON.parse(window.localStorage.getItem('character'));
+    const attachments = await loadAttachments(storedCharacter);
+    console.log(attachments);
+
+    const character = await new Character({
+      attachments,
+      rect: new Rect(0, 0, 64, 64),
+    });
 
     engine.addCharacter(character);
 

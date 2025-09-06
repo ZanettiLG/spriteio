@@ -8,6 +8,7 @@ export const SPRITE_TYPE = Object.freeze({
 });
 import { ASSET_STATUS, Asset } from "./asset";
 export class Texture extends Asset {
+  
   /**
    * @param {string} source 
    */
@@ -36,13 +37,16 @@ export class Texture extends Asset {
 }
 
 export class Sprite {
+  zIndex = 0;
+
   /**
    * 
    * @param {Texture} texture 
    * @param {Rect} rect 
    */
-  constructor(texture, rect) {
+  constructor(texture, {rect = new Rect(), zIndex = 0} = {}) {
     this.rect = rect;
+    this.zIndex = zIndex;
     this.texture = texture;
   }
 
@@ -96,6 +100,7 @@ export class Renderer {
    */
   addSprite(sprite) {
     this.sprites.push(sprite);
+    this.sprites.sort((a, b) => a.zIndex - b.zIndex);
   }
 
   /**
@@ -111,9 +116,9 @@ export class Renderer {
    */
   update() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.sprites.forEach((sprite) => {
+    for (const sprite of this.sprites) {
       sprite.draw(this.ctx, this.center);
-    });
+    }
   }
 
   async start() {
